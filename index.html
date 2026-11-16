@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Roblox map builder, modeler and Luau scripter. Maps, my own games, models and scripting work.">
+<title>Basel's Roblox Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a map-sheet portfolio. Wide hero shot, then each featured map as a sheet with a legend column (specs in studs and parts) beside its shots. Smaller builds sit in a two-column grid. */
+:root {
+  --bg: #0f1412;
+  --surface: #161d1a;
+  --line: #29332e;
+  --fg: #e8ede9;
+  --muted: #98a59d;
+  --accent: #e9b33c;
+  --accent-ink: #1b1404;
+  --shade: rgba(5, 8, 7, 0.86);
+  --display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #eef1ed; --surface: #ffffff; --line: #d2d9d3; --fg: #131a16; --muted: #56625a;
+    --accent: #9a6500; --accent-ink: #fff7e3; --shade: rgba(14, 19, 16, 0.88); color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #eef1ed; --surface: #ffffff; --line: #d2d9d3; --fg: #131a16; --muted: #56625a;
+  --accent: #9a6500; --accent-ink: #fff7e3; --shade: rgba(14, 19, 16, 0.88); color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.wrap {
+  max-width: 1240px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.eyebrow {
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* header */
+.top { padding-block: 56px 28px; display: grid; gap: 22px; }
+.top .eyebrow { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.top .eyebrow span:first-child { color: var(--accent); }
+h1 {
+  font-size: clamp(64px, 13vw, 168px); font-weight: 900; font-stretch: 68%; line-height: 0.86;
+  letter-spacing: -0.01em; text-transform: uppercase;
+}
+.lede { max-width: 60ch; font-size: 18px; color: var(--fg); }
+.contact { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip {
+  display: inline-flex; align-items: baseline; gap: 8px; padding: 8px 14px; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--surface); text-decoration: none; font-size: 14px; cursor: pointer;
+  color: var(--fg); font-family: var(--body);
+}
+.chip b { font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.chip:hover { border-color: var(--accent); }
+.chip.copied b { color: var(--accent); }
+
+/* shots */
+.shot { display: block; width: 100%; padding: 0; border: 0; background: var(--surface); cursor: zoom-in; overflow: hidden; }
+.shot img { display: block; width: 100%; height: 100%; object-fit: cover; max-width: 100%; transition: transform 0.4s ease; }
+.shot:hover img { transform: scale(1.025); }
+.hero { padding-bottom: 8px; }
+.hero .shot { aspect-ratio: 1920 / 850; border-radius: 4px; }
+.hero figcaption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; padding-top: 10px; font-size: 14px; color: var(--muted); }
+
+/* sections */
+section { padding-block: 64px 8px; }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; border-top: 2px solid var(--fg); padding-top: 14px; margin-bottom: 28px; }
+.sec-head h2 { font-size: clamp(30px, 4.6vw, 46px); font-weight: 800; font-stretch: 75%; text-transform: uppercase; letter-spacing: 0.01em; }
+
+/* featured sheet */
+.sheet { display: grid; grid-template-columns: minmax(0, 330px) minmax(0, 1fr); gap: 28px 40px; padding-block: 36px; border-bottom: 1px solid var(--line); }
+.sheet:last-of-type { border-bottom: 0; }
+.legend { display: grid; gap: 18px; align-content: start; min-width: 0; }
+.legend h3 { font-size: clamp(30px, 3.6vw, 40px); font-weight: 800; font-stretch: 72%; line-height: 1; text-transform: uppercase; }
+.legend .kind { color: var(--accent); }
+.legend p { color: var(--fg); font-size: 15.5px; }
+.specs { display: grid; gap: 0; margin: 0; border-top: 1px solid var(--line); }
+.specs div { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; padding-block: 9px; border-bottom: 1px solid var(--line); }
+.specs dt { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.specs dd { margin: 0; font-size: 14.5px; font-variant-numeric: tabular-nums; }
+.mosaic { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; min-width: 0; align-content: start; }
+.mosaic .shot { aspect-ratio: 16 / 9; border-radius: 3px; }
+.mosaic .shot.main { grid-column: 1 / -1; aspect-ratio: auto; }
+.mosaic .shot.main img { height: auto; }
+.mosaic.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mosaic.two .shot:not(.main) { aspect-ratio: 16 / 9; }
+.mosaic .shot.main.crop { aspect-ratio: 16 / 9; }
+.mosaic .shot.main.crop img { height: 100%; }
+
+/* grid of smaller builds */
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 32px; }
+.card { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.card .pics { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; }
+.card .pics .shot { aspect-ratio: 4 / 3; border-radius: 3px; }
+.card .pics .stack { display: grid; grid-template-rows: 1fr 1fr; gap: 8px; min-height: 0; }
+.card .pics .stack .shot { aspect-ratio: auto; position: relative; min-height: 0; }
+.card .pics .stack .shot img { position: absolute; inset: 0; }
+.card h3 { font-size: 26px; font-weight: 800; font-stretch: 75%; text-transform: uppercase; line-height: 1.05; }
+.card p { font-size: 15px; color: var(--fg); max-width: 62ch; }
+.card .eyebrow { margin-bottom: -6px; }
+.card.wide { grid-column: 1 / -1; }
+.card.wide .pics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.card.wide .pics .shot { aspect-ratio: 16 / 10; }
+.video { width: 100%; aspect-ratio: 16 / 9; display: block; background: #000; border-radius: 3px; max-width: 100%; }
+.legend ul { margin: 0; padding-left: 20px; font-size: 15px; display: grid; gap: 4px; }
+
+/* footer */
+.end { padding-block: 72px 64px; display: grid; gap: 18px; }
+.end h2 { font-size: clamp(36px, 6vw, 64px); font-weight: 900; font-stretch: 68%; text-transform: uppercase; line-height: 0.95; }
+.end p { color: var(--muted); max-width: 60ch; }
+
+/* viewer */
+dialog { padding: 0; border: 0; background: transparent; max-width: 100vw; max-height: 100vh; width: 100vw; height: 100vh; }
+dialog::backdrop { background: var(--shade); }
+.viewer { width: 100%; height: 100%; display: grid; grid-template-rows: 1fr auto; place-items: center; padding: 56px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)); gap: 12px; }
+.viewer img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 3px; min-height: 0; }
+.viewer .cap { color: #e8ede9; font-size: 14px; text-align: center; max-width: 70ch; }
+.vbtn { position: fixed; background: rgba(20, 26, 23, 0.9); color: #e8ede9; border: 1px solid #3a4540; border-radius: 999px; width: 44px; height: 44px; font-size: 20px; line-height: 1; cursor: pointer; }
+.vbtn.close { top: calc(12px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); }
+.vbtn.prev { left: max(16px, env(safe-area-inset-left, 0px)); top: 50%; }
+.vbtn.next { right: max(16px, env(safe-area-inset-right, 0px)); top: 50%; }
+
+@media (max-width: 900px) {
+  .sheet { grid-template-columns: minmax(0, 1fr); }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .top { padding-block: 36px 20px; }
+  .lede { font-size: 16.5px; }
+  .mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mosaic .shot:not(.main):last-child:nth-child(even) { grid-column: 1 / -1; }
+  .card.wide .pics { grid-template-columns: minmax(0, 1fr); }
+  .vbtn.prev, .vbtn.next { top: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) { .shot img { transition: none; } .shot:hover img { transform: none; } }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow"><span>Roblox map builder &amp; Luau scripter</span><span>UTC+3</span><span>Roblox Studio + Blender</span></div>
+    <h1>Basel</h1>
+    <p class="lede">I build Roblox maps: open districts, facilities and schools, from the layout plan to the finished build. I also make custom models, script the systems and UI that run on them, and I've shipped my own strategy game on Roblox. These are the builds I'm proudest of.</p>
+    <div class="contact">
+      <button class="chip" id="copy-discord" type="button" data-copy="basel_alblwie"><b>Discord</b><span>basel_alblwie</span></button>
+    </div>
+  </header>
+
+  <figure class="hero" style="margin:0">
+    <button class="shot" type="button"><img src="img/tokyo_avenue.jpg" width="1920" height="850" alt="Night avenue in Tokyo lined with neon signs, trees and traffic" data-cap="Near-night Tokyo: the four-lane avenue"></button>
+    <figcaption><span>Near-night Tokyo, a walkable open district</span><span>Tap any picture to view it full size</span></figcaption>
+  </figure>
+
+  <section aria-labelledby="maps">
+    <div class="sec-head"><h2 id="maps">Featured maps</h2><span class="eyebrow">6 builds</span></div>
+
+    <article class="sheet">
+      <div class="legend">
+        <span class="eyebrow kind">Open district</span>
+        <h3>Near-night Tokyo</h3>
+        <p>A walkable near-night Tokyo district with a scramble crossing, a four-lane avenue with a footbridge, a lantern alley, shops under a rail viaduct and a main street that ends at a shrine. The shops have real 3D interiors with 3D products on the shelves.</p>
+        <dl class="specs">
+          <div><dt>Parts</dt><dd>About 6,500, including 2,100 MeshParts</dd></div>
+          <div><dt>Models</dt><dd>Buildings, cars and trees are my own Blender models</dd></div>
+          <div><dt>Signs</dt><dd>Readable made-up Japanese names, no real brands</dd></div>
+          <div><dt>Road</dt><dd>Wet road reflections that run with no scripts</dd></div>
+        </dl>
+      </div>
+      <div class="mosaic">
+        <button class="shot main" type="button"><img src="img/tokyo_scramble.jpg" width="1920" height="850" loading="lazy" alt="Scramble crossing surrounded by tall buildings covered in neon signs" data-cap="The scramble crossing"></button>
+        <button class="shot" type="button"><img src="img/tokyo_lane.jpg" width="1920" height="850" loading="lazy" alt="Side street with shop signs, a taxi and a wet road" data-cap="Side street with a taxi on the wet road"></button>
+        <button class="shot" type="button"><img src="img/tokyo_yokocho.jpg" width="1920" height="850" loading="lazy" alt="Narrow alley of bar stalls hung with red lanterns" data-cap="Lantern alley of bar stalls"></button>
+        <button class="shot" type="button"><img src="img/tokyo_traffic.jpg" width="1920" height="850" loading="lazy" alt="City bus and taxi at a crossing at night" data-cap="Bus and taxi on the avenue"></button>
+        <button class="shot" type="button"><img src="img/tokyo_boards.jpg" width="1920" height="850" loading="lazy" alt="Street view looking up at stacked shop signs" data-cap="Stacked shop signs"></button>
+        <button class="shot" type="button"><img src="img/tokyo_viaduct.jpg" width="1920" height="850" loading="lazy" alt="Shops with lit windows along a wet street under a rail viaduct" data-cap="Shops under the rail viaduct"></button>
+        <button class="shot" type="button"><img src="img/tokyo_skyline.jpg" width="1920" height="850" loading="lazy" alt="City skyline of lit towers against a dark blue sky" data-cap="The far skyline"></button>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="legend">
+        <span class="eyebrow kind">School and town</span>
+        <h3>Sunset school</h3>
+        <p>A Japanese high school at golden hour, inside and out. A cherry garden leads to the clock tower front. Inside are classrooms, a library with 3D books, a staff room, a nurse's office, shoe lockers, a gym and the rooftop. Around it is a small town with tiled roofs, a narrow lane with power lines, rice fields and a ring of mountains.</p>
+        <dl class="specs">
+          <div><dt>Inside</dt><dd>Classrooms, library, staff room, nurse, shoe lockers, gym, rooftop</dd></div>
+          <div><dt>Outside</dt><dd>Cherry garden, sports ground, town streets, rice fields, mountains</dd></div>
+          <div><dt>Ground</dt><dd>Roblox terrain grass and mountains</dd></div>
+          <div><dt>Light</dt><dd>Golden hour sun, checked on low and high graphics</dd></div>
+        </dl>
+      </div>
+      <div class="mosaic two">
+        <button class="shot main" type="button"><img src="img/sunset_front.jpg" width="1598" height="901" loading="lazy" alt="Japanese school with a clock tower behind a garden of cherry trees and flower beds at sunset" data-cap="The school front and cherry garden at golden hour"></button>
+        <button class="shot" type="button"><img src="img/sunset_aerial.jpg" width="1601" height="901" loading="lazy" alt="Aerial view of the school, the town around it, rice fields and green mountains" data-cap="From the air: the school, the town, the rice fields and the mountains"></button>
+        <button class="shot" type="button"><img src="img/sunset_street.jpg" width="1601" height="901" loading="lazy" alt="Narrow town lane with power lines, parked cars and pine trees toward a mountain" data-cap="A town lane toward the mountains"></button>
+        <button class="shot" type="button"><img src="img/sunset_classroom.jpg" width="1598" height="901" loading="lazy" alt="Classroom with wooden desks, a chalkboard in Japanese and cherry trees outside" data-cap="A second-floor classroom"></button>
+        <button class="shot" type="button"><img src="img/sunset_library.jpg" width="1598" height="901" loading="lazy" alt="School library with shelves of books" data-cap="The library with 3D books"></button>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="legend">
+        <span class="eyebrow kind">Winter resort</span>
+        <h3>Hollowpine Lodge</h3>
+        <p>A mountain ski lodge at dusk. A log hotel with a glass gable holds a lobby with a stone fireplace and a front desk. Outside are log cabins along a lamp path, a chairlift up the slope and a ring of snowy peaks. Snow falls outside and stops when you walk indoors.</p>
+        <dl class="specs">
+          <div><dt>Parts</dt><dd>About 3,500, with 230 pines modelled in Blender</dd></div>
+          <div><dt>Areas</dt><dd>Hotel lobby, fireplace lounge, front desk, cabins, chairlift</dd></div>
+          <div><dt>Light</dt><dd>52 lights, checked on low and high graphics</dd></div>
+        </dl>
+      </div>
+      <div class="mosaic two">
+        <button class="shot main" type="button"><img src="img/resort_front.jpg" width="1598" height="901" loading="lazy" alt="Log hotel with a lit porch, a snowman and a fence under snowy peaks at dusk" data-cap="The hotel front"></button>
+        <button class="shot" type="button"><img src="img/resort_overview.jpg" width="1598" height="901" loading="lazy" alt="The hotel, a lamp path, log cabins and a chairlift seen from above in the snow" data-cap="The resort from above: hotel, cabins and chairlift"></button>
+        <button class="shot" type="button"><img src="img/resort_gable.jpg" width="1598" height="901" loading="lazy" alt="Back of the hotel with a tall glass wall showing the warm lobby inside" data-cap="The glass gable with the lobby lit inside"></button>
+        <button class="shot" type="button"><img src="img/resort_lobby.jpg" width="1598" height="901" loading="lazy" alt="Log lobby with roof trusses, a stone fireplace, sofas and a tall window onto the snow" data-cap="The lobby"></button>
+        <button class="shot" type="button"><img src="img/resort_fire.jpg" width="1598" height="901" loading="lazy" alt="Stone fireplace with two leather sofas, patterned rugs and a painting above" data-cap="The fireplace lounge"></button>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="legend">
+        <span class="eyebrow kind">Sci-fi interior</span>
+        <h3>Sci-fi rally hall</h3>
+        <p>The inside of a big military spaceship. Players spawn in a lobby beside a parked gunship under maintenance, climb a grand staircase and walk an arched hallway into a rally hall with a stage, side galleries, hanging banners and sky windows.</p>
+        <dl class="specs">
+          <div><dt>Hall</dt><dd>Room for 80 players, with a stage and galleries</dd></div>
+          <div><dt>Areas</dt><dd>Spawn lobby with gunship, staircase, hallway, rally hall, outer hull</dd></div>
+          <div><dt>Light</dt><dd>Warm industrial lighting, tuned on low and high graphics</dd></div>
+          <div><dt>Speed</dt><dd>60 FPS, tested on a phone</dd></div>
+        </dl>
+      </div>
+      <div class="mosaic two">
+        <button class="shot main crop" type="button"><img src="img/rally_hall.jpg" width="1043" height="1019" loading="lazy" alt="Large sci-fi hall with heavy pillars, hanging banners and a bright window at the far end" data-cap="The rally hall"></button>
+        <button class="shot" type="button"><img src="img/rally_shuttle.jpg" width="1043" height="1019" loading="lazy" alt="Dark gunship parked in a hangar lobby with crates and missiles beside it" data-cap="The gunship in the spawn lobby"></button>
+        <button class="shot" type="button"><img src="img/rally_stage.jpg" width="1043" height="1019" loading="lazy" alt="Stage with a round platform under hanging banners" data-cap="The stage"></button>
+        <button class="shot" type="button"><img src="img/rally_aisle.jpg" width="1043" height="1019" loading="lazy" alt="Side aisle of the hall with galleries above and banners" data-cap="Side aisle and galleries"></button>
+        <button class="shot" type="button"><img src="img/rally_hallway.jpg" width="1043" height="1019" loading="lazy" alt="Arched hallway with white light strips leading to the hall" data-cap="The arched hallway"></button>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="legend">
+        <span class="eyebrow kind">Realistic interior</span>
+        <h3>Industrial facility</h3>
+        <p>An SCP-style facility with four lighting states on one switch: day shift, night shift, alarm and blackout. It has a dispatch hub, a handling hall with racks, a forklift, a crane and a mezzanine, and a checkpoint with a vault door.</p>
+        <dl class="specs">
+          <div><dt>Parts</dt><dd>About 2,700</dd></div>
+          <div><dt>Lighting</dt><dd>4 states on one switch</dd></div>
+          <div><dt>Areas</dt><dd>Hub, handling hall, checkpoint and vault</dd></div>
+        </dl>
+      </div>
+      <div class="mosaic two">
+        <button class="shot main" type="button"><img src="img/fac_states.jpg" width="1956" height="992" loading="lazy" alt="Four views of the same hub under day, night, alarm and blackout lighting" data-cap="The hub in all four lighting states"></button>
+        <button class="shot" type="button"><img src="img/fac_mezz.jpg" width="1600" height="738" loading="lazy" alt="Warehouse hall seen from the mezzanine" data-cap="Handling hall from the mezzanine"></button>
+        <button class="shot" type="button"><img src="img/fac_vault.jpg" width="1600" height="738" loading="lazy" alt="Vault door under red alarm light" data-cap="Checkpoint vault during the alarm state"></button>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="legend">
+        <span class="eyebrow kind">Horror interior</span>
+        <h3>Retro horror room</h3>
+        <p>An abandoned living room for a retro R6 horror game. The old TV plays static and sometimes cuts to a warning frame. The lamps flicker, a bulb swings from the ceiling and moonlight comes in through the boarded window.</p>
+        <dl class="specs">
+          <div><dt>Size</dt><dd>40 x 40 studs</dd></div>
+          <div><dt>Parts</dt><dd>About 1,350, with no uploaded assets</dd></div>
+          <div><dt>Effects</dt><dd>TV static and signal breaks, flickering lamps, a swinging bulb</dd></div>
+        </dl>
+      </div>
+      <div class="mosaic two">
+        <button class="shot main" type="button"><img src="img/horror_sofa.jpg" width="1598" height="901" loading="lazy" alt="Dark living room with a blue sofa, a coffee table with papers and moonlight on the floor" data-cap="The sofa and the moonlight through the boards"></button>
+        <button class="shot" type="button"><img src="img/horror_door.jpg" width="1598" height="901" loading="lazy" alt="Dark room seen from the door with a TV showing static and a single hanging bulb" data-cap="The player's first view from the door"></button>
+        <button class="shot" type="button"><img src="img/horror_tv.jpg" width="1598" height="901" loading="lazy" alt="Old TV showing static under red writing on the wall" data-cap="The TV playing static"></button>
+        <button class="shot" type="button"><img src="img/horror_signal.jpg" width="1598" height="901" loading="lazy" alt="Old TV showing a white warning message on a black screen" data-cap="The signal break"></button>
+        <button class="shot" type="button"><img src="img/horror_photos.jpg" width="1598" height="901" loading="lazy" alt="Two framed photos on a striped wall, one of a family and one of a house" data-cap="The two photos on the wall"></button>
+      </div>
+    </article>
+  </section>
+
+  <section aria-labelledby="game">
+    <div class="sec-head"><h2 id="game">My own games</h2><span class="eyebrow">Live and in progress</span></div>
+
+    <article class="sheet">
+      <div class="legend">
+        <span class="eyebrow kind">Grand strategy · live</span>
+        <h3>War Table: WW2 Strategy</h3>
+        <p>My own strategy game, published on Roblox. Europe in 1939 is a giant 3D map you can walk across. You lead one nation's armies, fleets and air forces in real time while the AI runs the rest. I made all of it myself, from the map pipeline and the unit models to the Luau systems, the UI and the store art.</p>
+        <dl class="specs">
+          <div><dt>Map</dt><dd>504 provinces of 1939 Europe, built from real borders</dd></div>
+          <div><dt>Gameplay</dt><dd>6 playable nations, supply, terrain and winter, recruiting, 15 research upgrades, AI for every nation</dd></div>
+          <div><dt>Art</dt><dd>13 unit models made in Blender, painted in each nation's colour. Store art rendered from the game's own assets</dd></div>
+          <div><dt>Play</dt><dd><a href="https://www.roblox.com/games/105716373939065" target="_blank" rel="noopener">War Table on Roblox</a></dd></div>
+        </dl>
+      </div>
+      <div class="mosaic">
+        <button class="shot main" type="button"><img src="img/wt_hero2.jpg" width="1672" height="941" loading="lazy" alt="Tank firing at dusk with soldiers, planes overhead and the gold War Table WW2 Strategy logo over a campaign map" data-cap="Store art: War Table, WW2 Strategy"></button>
+        <button class="shot" type="button"><img src="img/wt_map.jpg" width="1600" height="900" loading="lazy" alt="3D map of Europe in nation colours with red campaign arrows" data-cap="The map of Europe in September 1939"></button>
+        <button class="shot" type="button"><img src="img/wt_sea.jpg" width="1600" height="900" loading="lazy" alt="Battleship firing a broadside at a burning cruiser" data-cap="A battleship broadside in the Channel"></button>
+        <button class="shot" type="button"><img src="img/wt_air.jpg" width="1600" height="900" loading="lazy" alt="Bombers in formation over the map with fighters attacking" data-cap="Bombers and fighters over Britain"></button>
+        <button class="shot" type="button"><img src="img/wt_lineup.jpg" width="1600" height="900" loading="lazy" alt="Units from six nations lined up with planes overhead" data-cap="One unit from each of the six playable nations"></button>
+        <button class="shot" type="button"><img src="img/wt_research.jpg" width="1600" height="900" loading="lazy" alt="Research panel with three branches of upgrades" data-cap="In game: the research tree, 3 branches of 5 levels"></button>
+        <button class="shot" type="button"><img src="img/wt_hero.jpg" width="1600" height="900" loading="lazy" alt="Toy-style tank firing at dusk with an explosion beside it" data-cap="Store art: armour crossing the border at dusk"></button>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="legend">
+        <span class="eyebrow kind">Sword simulator · in progress</span>
+        <h3>Sword Summit</h3>
+        <p>A sword simulator I'm building on Roblox. Players start in Summit Keep, a castle courtyard with a pet hatchery, shop booths and a leaderboard, then head out to the stages. Rock Ridge is a floating mountain stage above the clouds:</p>
+        <ul>
+          <li>winding streams with flowing ripples and a waterfall off the cliff</li>
+          <li>a gorge crossed by a rope bridge</li>
+          <li>a crystal grove, a golem quarry, and sky islands to jump across</li>
+        </ul>
+        <dl class="specs">
+          <div><dt>Lobby</dt><dd>Summit Keep: castle gate, sword plaza, hatchery, booths, leaderboard</dd></div>
+          <div><dt>Combat</dt><dd>Bosses on every stage with their own specials, monster patrols, player skills on Q, F and R</dd></div>
+          <div><dt>Models</dt><dd>Skeleton King and Rock Golems rigged with their own fight animations</dd></div>
+        </dl>
+      </div>
+      <div class="mosaic two ss">
+        <button class="shot main" type="button"><img src="img/keep_aerial.jpg" width="1043" height="795" loading="lazy" alt="Castle courtyard lobby with towers, a sword monument, a hatchery and market booths, with stages behind" data-cap="Summit Keep, the lobby, with the stages behind it"></button>
+        <button class="shot" type="button"><img src="img/keep_gate.jpg" width="1043" height="795" loading="lazy" alt="Castle gate with a Sword Summit sign, banners, bunting and lanterns" data-cap="The keep gate where players spawn"></button>
+        <button class="shot" type="button"><img src="img/ss_world2.jpg" width="1600" height="900" loading="lazy" alt="A floating mountain stage with a winding stream, a summit with waterfalls and sky islands" data-cap="Rock Ridge from the air: the winding stream, the gorge, the summit falls, the crystal grove and the sky islands"></button>
+        <button class="shot" type="button"><img src="img/ss_cascade.jpg" width="1600" height="900" loading="lazy" alt="Waterfalls cascading down grass terraces into a lily pond that feeds a stream" data-cap="The summit falls cascading into the lily pond and the stream"></button>
+        <button class="shot" type="button"><img src="img/ss_king.jpg" width="1600" height="900" loading="lazy" alt="Skeleton King boss with a crown and greatsword in an arena" data-cap="The Skeleton King boss in his arena"></button>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="legend">
+        <span class="eyebrow kind">64-player war · in progress</span>
+        <h3>Ashgrad</h3>
+        <p>A WW2 city battle for 64 players that I'm building on Roblox. Tanks and infantry fight street by street through a city in a late-winter thaw. Tank rounds blow holes in the walls, floors fall and whole houses collapse into rubble. Soldiers can go inside the houses and fight from the windows.</p>
+        <dl class="specs">
+          <div><dt>City</dt><dd>100 buildings on a 5,600 x 4,600 stud map</dd></div>
+          <div><dt>Destruction</dt><dd>Walls break piece by piece, floors fall, houses collapse</dd></div>
+          <div><dt>Interiors</dt><dd>Furnished houses, each laid out differently</dd></div>
+          <div><dt>Speed</dt><dd>60 FPS on PC with 63 bots fighting</dd></div>
+        </dl>
+      </div>
+      <div class="mosaic two">
+        <button class="shot main crop" type="button"><img src="img/ash_collapse.jpg" width="1043" height="1020" loading="lazy" alt="Yellow house with its front wall falling away, chunks in the air and rubble below" data-cap="A house collapsing after tank fire"></button>
+        <button class="shot" type="button"><img src="img/ash_avenue.jpg" width="1044" height="1020" loading="lazy" alt="Avenue of brick buildings and bare trees with a tank and a smoke column in the distance" data-cap="The avenue toward the steelworks"></button>
+        <button class="shot" type="button"><img src="img/ash_shells.jpg" width="1043" height="1020" loading="lazy" alt="House with its wall blown open, showing furnished rooms on two floors" data-cap="After three tank rounds: the rooms open to the street"></button>
+        <button class="shot" type="button"><img src="img/ash_after.jpg" width="1043" height="1020" loading="lazy" alt="Rubble pile where a house stood, with brick buildings behind" data-cap="What is left after the collapse"></button>
+        <button class="shot" type="button"><img src="img/ash_room.jpg" width="1043" height="1020" loading="lazy" alt="Living room with a table, chairs and a bookcase, and the snowy city outside the windows" data-cap="Inside one of the furnished houses"></button>
+      </div>
+    </article>
+  </section>
+
+  <section aria-labelledby="models">
+    <div class="sec-head"><h2 id="models">Models and animation</h2><span class="eyebrow">Blender to Roblox</span></div>
+    <div class="grid">
+      <article class="card">
+        <div class="pics">
+          <button class="shot" type="button"><img src="img/car_sheet.jpg" width="2400" height="1825" loading="lazy" alt="Overview sheet of a red sports coupe" data-cap="Sports coupe: overview sheet"></button>
+          <div class="stack">
+            <button class="shot" type="button"><img src="img/car_front.jpg" width="1600" height="1000" loading="lazy" alt="Red sports coupe from the front" data-cap="Sports coupe from the front"></button>
+            <button class="shot" type="button"><img src="img/car_rear.jpg" width="1600" height="1000" loading="lazy" alt="Red sports coupe from the rear" data-cap="Sports coupe from the rear"></button>
+          </div>
+        </div>
+        <span class="eyebrow">Vehicle</span>
+        <h3>Sports coupe</h3>
+        <p>A glossy coupe for a racing or city game. 14.5k triangles with PBR paint, and the body and four wheels are separate parts pivoted on the axles, ready for a car chassis.</p>
+      </article>
+
+      <article class="card">
+        <div class="pics">
+          <button class="shot" type="button"><img src="img/warden_sheet.jpg" width="2400" height="1895" loading="lazy" alt="Overview sheet of an armoured boss with a greatsword" data-cap="Ashen Warden: overview sheet"></button>
+          <div class="stack">
+            <button class="shot" type="button"><img src="img/warden_front.jpg" width="1600" height="1000" loading="lazy" alt="Armoured boss seen from the front" data-cap="Ashen Warden from the front"></button>
+            <button class="shot" type="button"><img src="img/warden_slam.jpg" width="1600" height="1000" loading="lazy" alt="Armoured boss slamming a greatsword into the ground" data-cap="The overhead slam attack"></button>
+          </div>
+        </div>
+        <span class="eyebrow">Rigged boss</span>
+        <h3>Ashen Warden</h3>
+        <p>An armoured boss for a boss-fight game, with a horned helm, fur mantle and two-handed greatsword. Rigged, with idle, walk and overhead slam animations.</p>
+      </article>
+
+      <article class="card wide">
+        <video class="video" controls preload="none" playsinline poster="img/cut_poster.jpg" src="img/boss_cutscene.mp4" aria-label="Boss cutscene video"></video>
+        <span class="eyebrow">Animation</span>
+        <h3>Boss cutscene</h3>
+        <p>A 20 second boss intro with 11 shots, camera work and sound. Press play, the video has audio.</p>
+      </article>
+
+      <article class="card wide">
+        <div class="pics">
+          <button class="shot" type="button"><img src="img/pets_sheet9.jpg" width="2400" height="1500" loading="lazy" alt="Sheet of nine voxel pets: cat, pup, fox, penguin, turtle, seal, panda, lion and crowned cat, each labelled with its egg" data-cap="Legendary voxel pets: all nine, by egg"></button>
+          <button class="shot" type="button"><img src="img/pets_penguin.jpg" width="1400" height="1400" loading="lazy" alt="Voxel penguin with an ice crown and glowing cyan wave runes" data-cap="Frost Penguin: ice crown, glowing wave runes and crystal flippers"></button>
+          <button class="shot" type="button"><img src="img/pets_ingame9.jpg" width="1044" height="652" loading="lazy" alt="Turtle, seal and penguin pets with glowing crystals in a Roblox lobby" data-cap="In game: the Ocean Egg pets following the player"></button>
+        </div>
+        <span class="eyebrow">Rigged pets</span>
+        <h3>Legendary voxel pets</h3>
+        <p>Nine voxel pets for a Roblox simulator, hatched from three eggs. I rigged each one by hand with idle and walk animations that suit the animal: the four-legged ones trot, the penguin waddles, the turtle paddles and the seal hops on its belly. Glow maps make the runes, crystals and flames light up in game. They follow the player and trail sparkles in their glow colour. Each is under 20k triangles.</p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="systems">
+    <div class="sec-head"><h2 id="systems">Systems and UI</h2><span class="eyebrow">Scripting</span></div>
+    <div class="grid">
+      <article class="card wide">
+        <div class="pics">
+          <button class="shot" type="button"><img src="img/shoot_hud.jpg" width="1600" height="742" loading="lazy" alt="Shooter gameplay with a capture point HUD" data-cap="Capture point HUD in a street shooter"></button>
+          <button class="shot" type="button"><img src="img/shoot_bots.jpg" width="1600" height="742" loading="lazy" alt="AI bots fighting on a street" data-cap="AI bots fighting over a capture point"></button>
+          <button class="shot" type="button"><img src="img/spy_hud.jpg" width="1252" height="734" loading="lazy" alt="Spy game HUD" data-cap="Spy game HUD"></button>
+        </div>
+        <span class="eyebrow">Luau</span>
+        <h3>Shooter systems and UI</h3>
+        <p>A capture point loop with its HUD, first-person aiming and AI bots that fight over the points. Also HUD and briefing screens for a spy game.</p>
+      </article>
+    </div>
+  </section>
+
+  <footer class="end">
+    <h2>Got a map in mind?</h2>
+    <p>Send me the idea or a few references on Discord and I'll come back with a layout and a price.</p>
+    <div class="contact">
+      <button class="chip" id="copy-discord-2" type="button" data-copy="basel_alblwie"><b>Discord</b><span>basel_alblwie</span></button>
+    </div>
+  </footer>
+</div>
+
+<dialog id="viewer" aria-label="Picture viewer">
+  <div class="viewer">
+    <img id="v-img" alt="">
+    <p class="cap" id="v-cap"></p>
+  </div>
+  <button class="vbtn close" id="v-close" type="button" aria-label="Close">×</button>
+  <button class="vbtn prev" id="v-prev" type="button" aria-label="Previous picture">‹</button>
+  <button class="vbtn next" id="v-next" type="button" aria-label="Next picture">›</button>
+</dialog>
+
+<script>
+(function () {
+  var shots = Array.prototype.slice.call(document.querySelectorAll(".shot img"));
+  var dlg = document.getElementById("viewer");
+  var vImg = document.getElementById("v-img");
+  var vCap = document.getElementById("v-cap");
+  var cur = 0;
+  function show(i) {
+    cur = (i + shots.length) % shots.length;
+    var s = shots[cur];
+    vImg.src = s.getAttribute("src");
+    vImg.alt = s.alt;
+    vCap.textContent = s.dataset.cap || s.alt;
+  }
+  shots.forEach(function (img, i) {
+    img.closest(".shot").addEventListener("click", function () {
+      show(i);
+      if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
+    });
+  });
+  function close() { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); }
+  document.getElementById("v-close").addEventListener("click", close);
+  document.getElementById("v-prev").addEventListener("click", function () { show(cur - 1); });
+  document.getElementById("v-next").addEventListener("click", function () { show(cur + 1); });
+  dlg.addEventListener("click", function (e) { if (e.target === dlg || e.target.classList.contains("viewer")) close(); });
+  document.addEventListener("keydown", function (e) {
+    if (!dlg.open) return;
+    if (e.key === "ArrowRight") show(cur + 1);
+    if (e.key === "ArrowLeft") show(cur - 1);
+  });
+
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.dataset.copy;
+      var label = btn.querySelector("b");
+      function done() {
+        btn.classList.add("copied");
+        label.textContent = "Copied";
+        setTimeout(function () { btn.classList.remove("copied"); label.textContent = "Discord"; }, 1600);
+      }
+      function fallback() {
+        var span = btn.querySelector("span");
+        var r = document.createRange();
+        r.selectNodeContents(span);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(r);
+      }
+      try {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } catch (err) { fallback(); }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
