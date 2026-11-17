@@ -116,6 +116,7 @@ section { padding-block: 64px 8px; }
 .card.wide { grid-column: 1 / -1; }
 .card.wide .pics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .card.wide .pics .shot { aspect-ratio: 16 / 10; }
+.card.wide .pics.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .video { width: 100%; aspect-ratio: 16 / 9; display: block; background: #000; border-radius: 3px; max-width: 100%; }
 .legend ul { margin: 0; padding-left: 20px; font-size: 15px; display: grid; gap: 4px; }
 
@@ -144,7 +145,7 @@ dialog::backdrop { background: var(--shade); }
   .lede { font-size: 16.5px; }
   .mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mosaic .shot:not(.main):last-child:nth-child(even) { grid-column: 1 / -1; }
-  .card.wide .pics { grid-template-columns: minmax(0, 1fr); }
+  .card.wide .pics, .card.wide .pics.two { grid-template-columns: minmax(0, 1fr); }
   .vbtn.prev, .vbtn.next { top: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
 }
 @media (prefers-reduced-motion: reduce) { .shot img { transition: none; } .shot:hover img { transform: none; } }
@@ -405,9 +406,8 @@ dialog::backdrop { background: var(--shade); }
       </article>
 
       <article class="card wide">
-        <div class="pics">
+        <div class="pics two">
           <button class="shot" type="button"><img src="img/pets_sheet9.jpg" width="2400" height="1500" loading="lazy" alt="Sheet of nine voxel pets: cat, pup, fox, penguin, turtle, seal, panda, lion and crowned cat, each labelled with its egg" data-cap="Legendary voxel pets: all nine, by egg"></button>
-          <button class="shot" type="button"><img src="img/pets_penguin.jpg" width="1400" height="1400" loading="lazy" alt="Voxel penguin with an ice crown and glowing cyan wave runes" data-cap="Frost Penguin: ice crown, glowing wave runes and crystal flippers"></button>
           <button class="shot" type="button"><img src="img/pets_ingame9.jpg" width="1044" height="652" loading="lazy" alt="Turtle, seal and penguin pets with glowing crystals in a Roblox lobby" data-cap="In game: the Ocean Egg pets following the player"></button>
         </div>
         <span class="eyebrow">Rigged pets</span>
